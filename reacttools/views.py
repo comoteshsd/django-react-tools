@@ -163,6 +163,15 @@ class ReactProxyMixin(object):
             parser = ReactHTMLParser()
             parser.feed(content)
 
+            if settings.DEBUG:
+                print("len(parser.data['react_scripts']): %s" % len(parser.data['react_scripts']) )     # todo: move to logger?
+
+            output = []
+            for x in parser.data['react_scripts']:
+                if x not in output:
+                    output.append(x)
+            parser.data['react_scripts'] = output
+
             kwargs['react_styles'] = []
             kwargs['react_scripts'] = [ reverse_lazy( self.react_proxy_resource_name, args=(p,) ) for p in parser.data['react_scripts'] ]
             kwargs['react_manifest'] = reverse_lazy( self.react_proxy_resource_name, args=(parser.data['react_manifest'], ) )

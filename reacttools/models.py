@@ -42,12 +42,24 @@ class ReactAppSettings(models.Model):
     def css(self):
         return str(self.css_data).split()
 
-    def js_paths(self):
+    def js_paths_after(self):
         if self.static_path_prefix:
             return [ static("js/%s/%s" % (self.static_path_prefix, s) ) for s in self.js ]
         return [ static("js/%s" % (s) ) for s in self.js ]
     
-    def css_paths(self):
+    def css_paths_after(self):
         if self.static_path_prefix:
             return [ static("css/%s/%s" % (self.static_path_prefix, s) ) for s in self.css ]
         return [ static("css/%s" % (s) ) for s in self.css ]
+
+    def js_paths(self):
+        main = self.name  + '/' if self.name != '' else ''
+        if self.static_path_prefix:
+            return [ static("%sjs/%s/%s" % (main, self.static_path_prefix, s) ) for s in self.js ]
+        return [ static("%sjs/%s" % (main, s) ) for s in self.js ]
+    
+    def css_paths(self):
+        main = self.name  + '/' if self.name != '' else ''
+        if self.static_path_prefix:
+            return [ static("%scss/%s/%s" % (main, self.static_path_prefix, s) ) for s in self.css ]
+        return [ static("%scss/%s" % (main, s) ) for s in self.css ]

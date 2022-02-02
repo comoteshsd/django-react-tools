@@ -88,7 +88,7 @@ class Command(BaseCommand):
         for key, value in files:
 
             if key.split(".")[-1] in REACT_FILE_TYPES:
-                relative_value = value[1:]
+                relative_value = value[1:] if value[0] == '/' else value
                 dest = self.destination_path(relative_value)
 
                 if dest == None:    # If the destination is not valid, it will return None
@@ -109,7 +109,7 @@ class Command(BaseCommand):
         for key, value in files:
 
             if key.split(".")[-1] in REACT_FILE_TYPES:
-                relative_value = value[1:]
+                relative_value = value[1:] if value[0] == '/' else value
                 source = os.path.abspath(os.path.join( REACT_BUILD_DIRECTORY, relative_value ))
                 dest = self.destination_path(relative_value)
 
@@ -122,6 +122,18 @@ class Command(BaseCommand):
 
                 subprocess.run("cp %s %s" % (source, dest), shell=True)
 
+                # empty hash into dest file
+                bHash = False
+                hashIsHex = source.split(".")[-2]
+                if source.split(".")[-1] == 'map':
+                    hashIsHex = source.split(".")[-3]
+                try:
+                    bHash = str(int(hashIsHex, 16)).isdigit()
+                except:
+                    print("%s не хеш" % (hashIsHex))
+                if bHash:
+                    print("Удаляю в файле %s: %s -> ''" % (dest, hashIsHex + '.') )
+                    subprocess.run("sed -i 's/%s//' %s" % (hashIsHex + '.', dest), shell=True)
 
     def destination_path(self, file_path):
         '''
